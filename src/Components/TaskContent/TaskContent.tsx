@@ -6,10 +6,7 @@ import { defaultCols } from "../TaskBoard/TaskBoard";
 type TaskContentProps = {
   task: Task;
   columnId: number;
-  moveTask: (
-    taskId: number,
-    targetColumnId: number
-  ) => void;
+  moveTask: (taskId: number, targetColumnId: number) => void;
 };
 
 const TaskContent: React.FC<TaskContentProps> = ({

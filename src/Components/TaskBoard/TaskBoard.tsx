@@ -66,15 +66,13 @@ const defaultTasks = [
     columnId: 4,
     content: "buy bananas",
   },
-  {
-    id: 9,
-    columnId: 4,
-    content: "buy veggie",
-  },
 ];
 
+const hasTask = (task?: Task): task is Task =>
+  !!task && Object.keys(task).length > 0;
+
 const TaskBoard: React.FC = () => {
-  const [columns, setColumns] = useState<Column[]>(defaultCols);
+  const [columns] = useState<Column[]>(defaultCols);
   const [tasks, setTasks] = useState<Task[]>(defaultTasks);
 
   const createTask = (columnId: number) => {
@@ -94,24 +92,31 @@ const TaskBoard: React.FC = () => {
   );
 
   const moveTask =
-    (position: number) =>
-    (taskId: number, targetColumnId: number) => {
+    (position: number) => (taskId: number, targetColumnId: number) => {
       const updatedTasks = [...tasks];
       const taskToMove = updatedTasks.find((task) => task.id === taskId);
       const taskIndex = updatedTasks.findIndex((task) => task.id === taskId);
 
-      const nextColumn = filteredList(targetColumnId)[position];
+      const nextColumn = filteredList(targetColumnId);
+
+      const nextColumnItem = nextColumn[position];
+
       updatedTasks.splice(taskIndex, 1);
 
       const value = updatedTasks.findIndex(
-        (item) => item.id === nextColumn?.id
+        (item) => item.id === nextColumnItem?.id
       );
 
-      //  @ts-ignore
-      updatedTasks.splice(value, 0, {
-        ...taskToMove,
-        columnId: targetColumnId,
-      });
+      if (!hasTask(taskToMove)) return;
+
+      if (targetColumnId === defaultCols.length && value === -1) {
+        updatedTasks.push({ ...taskToMove, columnId: targetColumnId });
+      } else {
+        updatedTasks.splice(value, 0, {
+          ...taskToMove,
+          columnId: targetColumnId,
+        });
+      }
       setTasks(updatedTasks);
     };
 
